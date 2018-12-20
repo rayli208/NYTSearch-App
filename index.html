@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+  <link rel="stylesheet" href="style.css">
+  <title>New York Times</title>
+</head>
+
+<body>
+  <div class="jumbotron jumbotron-fluid bg-dark">
+    <div class="container">
+      <h1 class="display-4 text-light mx-auto"><i class="fas fa-newspaper"></i> New York Times Seach</h1>
+    </div>
+  </div>
+  <div class="container mb-3">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-search"></i> Search Paramaters
+      </div>
+      <div class="card-body">
+        <form>
+          <div class="form-group">
+            <label for="SearchTerm">Search Term</label>
+            <input class="form-control" id="SearchTerm" placeholder="Search">
+          </div>
+          <div class="form-group">
+            <label for="RecordsNumber">Number of Records to Retrieve</label>
+            <input type="number" class="form-control" id="RecordsNumber" placeholder="Record Numbers">
+          </div>
+          <div class="form-group">
+            <label for="StartYear">Start Year(optional)</label>
+            <input type="number" class="form-control" id="StartYear" placeholder="Start Year">
+          </div>
+          <div class="form-group">
+            <label for="EndYear">End Year (optional)</label>
+            <input type="number" class="form-control" id="EndYear" placeholder="End Year">
+          </div>
+          <a id="Submit" class="btn btn-outline-success btn-lg " role="button"><i class="fas fa-search"></i> Search</a>
+          <a id="Delete" class="btn btn-outline-danger btn-lg "><i class="fas fa-trash-alt"></i> Clear Results</a>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mb-3">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-th"></i> Top Articles
+      </div>
+      <div class="card-body">
+        <div id="Results"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand mx-auto" href="#">Group: Rayli, Alan, Fahim, Christian</a>
+  </nav>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+
+  <script>
+    $("#Submit").on("click", function () {
+      var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+      var searchParam = $('#SearchTerm').val(); 
+      var pageNumber = $('#RecordsNumber').val();
+      var startYear = $('#StartYear').val();
+      var endYear = $('#EndYear').val();
+
+      url += '?' + $.param({
+        'api-key': "eae7407fee8d450589f3b327a198477a",
+        'q': searchParam,
+        'page': pageNumber,
+        'begin_date': startYear+'0101',
+        'end_date': endYear+'1231'
+      });
+      $.ajax({
+        url: url,
+        method: 'GET',
+      }).then(function (result) {
+        $("#Results").empty();
+        for(var i =0; i< pageNumber;i++){
+        var headline = result.response.docs[i].headline.main;
+        var yearMade = result.response.docs[i].pub_date;
+        var publishedBy = result.response.docs[i].byline.person[0].firstname + ' ' + result.response.docs[i].byline.person[0].lastname;
+
+        var h4 = $("<h4>").html((i+1) + '. ' + headline);
+        $("#Results").append(h4);
+        var p = $("<p>").html('Published in: ' + yearMade);
+        $("#Results").append(p);
+        var pp = $("<p>").html('Published by: ' + publishedBy);
+        $("#Results").append(pp);
+        }
+      })
+    })
+
+    $("#Delete").on("click", function(){
+      $("#Results").empty();
+      $("#SearchTerm").val('');
+      $("#RecordsNumber").val('');
+      $("#StartYear").val('');
+      $("#EndYear").val('');
+
+
+    });
+  </script>
+
+
+</body>
+
+</html>
